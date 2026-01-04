@@ -1,6 +1,6 @@
 {
   "name": "vue-smart-svg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Webpack loader that turns SVGs into Vue 2 and Vue 3 components.",
   "author": "adriantandara",
   "license": "MIT",

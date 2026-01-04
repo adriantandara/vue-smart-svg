@@ -1,16 +1,36 @@
-﻿import type { GenerateOptions } from "./types";
+import type { GenerateOptions } from "./types";
 
-function sharedHelpers(svg: string, defaultSize: number): string {
+function sharedHelpers(svg: string, options: GenerateOptions): string {
   const svgLiteral = JSON.stringify(svg);
   return [
-    `const __svg = ${svgLiteral};`,
-    "const __defaultSize = " + defaultSize + ";",
+    `const __svgOriginal = ${svgLiteral};`,
+    "let __svgColorized = null;",
+    "const __defaultSize = " + options.defaultSize + ";",
+    "const __defaultReplaceColors = " + (options.defaultReplaceColors ? "true" : "false") + ";",
     "const __baseStyle = { display: \"inline-block\", lineHeight: \"0\" };",
     "const __sanitizeTitle = (title) => (title ? String(title).replace(/[<>]/g, \"\") : \"\");",
     "const __injectTitle = (svg, title) => svg.replace(/<svg\\b[^>]*>/i, (m) => m + \"<title>\" + title + \"</title>\");",
-    "const __resolveSvg = (title) => {",
+    "const __replaceColorAttr = (svg, attr) => {",
+    "  const regex = new RegExp(`\\\\s${attr}=(\"|')?([^\"'\\\\s>]+)\\\\1`, \"gi\");",
+    "  return svg.replace(regex, (match, quote, value) => {",
+    "    if (String(value).toLowerCase() === \"none\") {",
+    "      return match;",
+    "    }",
+    "    const q = quote || '\"';",
+    "    return ` ${attr}=${q}currentColor${q}`;",
+    "  });",
+    "};",
+    "const __toCurrentColor = (svg) => __replaceColorAttr(__replaceColorAttr(svg, \"fill\"), \"stroke\");",
+    "const __getSvg = (useOriginal) => {",
+    "  if (useOriginal) return __svgOriginal;",
+    "  if (__svgColorized) return __svgColorized;",
+    "  __svgColorized = __toCurrentColor(__svgOriginal);",
+    "  return __svgColorized;",
+    "};",
+    "const __resolveSvg = (title, useOriginal) => {",
     "  const safe = __sanitizeTitle(title);",
-    "  return safe ? __injectTitle(__svg, safe) : __svg;",
+    "  const base = __getSvg(Boolean(useOriginal));",
+    "  return safe ? __injectTitle(base, safe) : base;",
     "};",
     "const __hasSizeClass = (klass) => {",
     "  if (!klass) return false;",
@@ -23,7 +43,7 @@ function sharedHelpers(svg: string, defaultSize: number): string {
 }
 
 export function generateVue3ComponentCode(svg: string, options: GenerateOptions): string {
-  const helpers = sharedHelpers(svg, options.defaultSize);
+  const helpers = sharedHelpers(svg, options);
   return [
     "import { defineComponent, h } from \"vue\";",
     "",
@@ -35,7 +55,8 @@ export function generateVue3ComponentCode(svg: string, options: GenerateOptions)
     "  props: {",
     "    size: { type: [Number, String], default: undefined },",
     "    title: { type: String, default: \"\" },",
-    "    decorative: { type: Boolean, default: true }",
+    "    decorative: { type: Boolean, default: true },",
+    "    replaceColors: { type: Boolean, default: __defaultReplaceColors }",
     "  },",
     "  setup(props, { attrs }) {",
     "    return () => {",
@@ -50,6 +71,7 @@ export function generateVue3ComponentCode(svg: string, options: GenerateOptions)
     "      const ariaHidden = attrsSafe[\"aria-hidden\"] ?? (props.decorative && !hasTitle ? \"true\" : undefined);",
     "      const role = attrsSafe.role ?? (!props.decorative && hasTitle ? \"img\" : undefined);",
     "      const ariaLabel = attrsSafe[\"aria-label\"] ?? (!props.decorative && hasTitle ? props.title : undefined);",
+    "      const useOriginal = props.replaceColors === false;",
     "",
     "      return h(\"span\", {",
     "        ...attrsSafe,",
@@ -57,7 +79,7 @@ export function generateVue3ComponentCode(svg: string, options: GenerateOptions)
     "        \"aria-hidden\": ariaHidden,",
     "        role,",
     "        \"aria-label\": ariaLabel,",
-    "        innerHTML: __resolveSvg(props.title)",
+    "        innerHTML: __resolveSvg(props.title, useOriginal)",
     "      });",
     "    };",
     "  }",
@@ -66,7 +88,7 @@ export function generateVue3ComponentCode(svg: string, options: GenerateOptions)
 }
 
 export function generateVue2ComponentCode(svg: string, options: GenerateOptions): string {
-  const helpers = sharedHelpers(svg, options.defaultSize);
+  const helpers = sharedHelpers(svg, options);
   return [
     helpers,
     "",
@@ -76,7 +98,8 @@ export function generateVue2ComponentCode(svg: string, options: GenerateOptions)
     "  props: {",
     "    size: { type: [Number, String] },",
     "    title: { type: String, default: \"\" },",
-    "    decorative: { type: Boolean, default: true }",
+    "    decorative: { type: Boolean, default: true },",
+    "    replaceColors: { type: Boolean, default: __defaultReplaceColors }",
     "  },",
     "  render(h, ctx) {",
     "    const props = ctx.props || {};",
@@ -93,6 +116,7 @@ export function generateVue2ComponentCode(svg: string, options: GenerateOptions)
     "    const ariaHidden = attrs[\"aria-hidden\"] != null ? attrs[\"aria-hidden\"] : (props.decorative && !hasTitle ? \"true\" : undefined);",
     "    const role = attrs.role != null ? attrs.role : (!props.decorative && hasTitle ? \"img\" : undefined);",
     "    const ariaLabel = attrs[\"aria-label\"] != null ? attrs[\"aria-label\"] : (!props.decorative && hasTitle ? props.title : undefined);",
+    "    const useOriginal = props.replaceColors === false;",
     "    const mergedAttrs = { ...attrs };",
     "    if (ariaHidden !== undefined) mergedAttrs[\"aria-hidden\"] = ariaHidden;",
     "    if (role !== undefined) mergedAttrs.role = role;",
@@ -102,7 +126,7 @@ export function generateVue2ComponentCode(svg: string, options: GenerateOptions)
     "      ...data,",
     "      attrs: mergedAttrs,",
     "      style,",
-    "      domProps: { ...(data.domProps || {}), innerHTML: __resolveSvg(props.title) }",
+    "      domProps: { ...(data.domProps || {}), innerHTML: __resolveSvg(props.title, useOriginal) }",
     "    });",
     "  }",
     "};"

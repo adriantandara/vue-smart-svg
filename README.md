@@ -104,6 +104,7 @@ import Icon from "./icon.svg";
   <Icon class="text-red-500 w-6 h-6" />
   <Icon :size="32" />
   <Icon title="Settings" :decorative="false" />
+  <Icon :replaceColors="false" />
 </template>
 ```
 
@@ -137,7 +138,7 @@ Runnable Vue 2 and Vue 3 demos live in `examples/vue2` and `examples/vue3`, both
 
 - `svgo` (default `true`): optimize SVGs with SVGO.
 - `defaultSize` (default `24`): fallback size for the `size` prop.
-- `replaceColors` (default `true`): replace `fill`/`stroke` with `currentColor` (except `none`).
+- `replaceColors` (default `true`): replace `fill`/`stroke` with `currentColor` (except `none`); this is also the default for the component prop, so set it to `false` to keep original colors by default and opt in per icon with the `replaceColors` prop.
 - `keepViewBox` (default `true`): keep `viewBox` when optimizing.
 - `vueVersion` (`2` | `3` | `"auto"`, default `"auto"`): auto-detect; falls back to Vue 3 if `vue/package.json` cannot be found.
 - `rawMode` (`"query"` | `"suffix"` | `"both"`, default `"query"`): decide if raw imports are detected via `?raw`, `.raw.svg`, or both.

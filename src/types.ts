@@ -12,4 +12,5 @@ export interface LoaderOptions {
 
 export interface GenerateOptions {
   defaultSize: number;
+  defaultReplaceColors: boolean;
 }

@@ -10,7 +10,7 @@
 }
 
 export function stripWidthHeight(svg: string): string {
-  return svg.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+  return svg.replace(/<svg\b([^>]*)>/i, (_, attrs) => {
     const cleaned = String(attrs)
       .replace(/\s(width|height)=("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
       .replace(/\s{2,}/g, " ");

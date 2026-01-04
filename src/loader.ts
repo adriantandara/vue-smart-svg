@@ -4,7 +4,7 @@ import { optimize } from "svgo";
 import type { LoaderDefinitionFunction } from "webpack";
 import { detectVueMajor } from "./detect";
 import { generateVue2ComponentCode, generateVue3ComponentCode } from "./generate";
-import { normalizeSvg, stripWidthHeight, toCurrentColor } from "./transform";
+import { normalizeSvg, stripWidthHeight } from "./transform";
 import type { LoaderOptions, VueVersionOption } from "./types";
 
 const defaultOptions: Required<LoaderOptions> = {
@@ -75,16 +75,13 @@ const loader: LoaderDefinitionFunction<LoaderOptions> = function loader(source) 
   }
 
   svg = stripWidthHeight(svg);
-  if (options.replaceColors) {
-    svg = toCurrentColor(svg);
-  }
   svg = normalizeSvg(svg);
 
   const context = this.rootContext || this.context || process.cwd();
   const vueMajor = resolveVueVersion(options.vueVersion, context);
   const code = vueMajor === 2
-    ? generateVue2ComponentCode(svg, { defaultSize: options.defaultSize })
-    : generateVue3ComponentCode(svg, { defaultSize: options.defaultSize });
+    ? generateVue2ComponentCode(svg, { defaultSize: options.defaultSize, defaultReplaceColors: options.replaceColors })
+    : generateVue3ComponentCode(svg, { defaultSize: options.defaultSize, defaultReplaceColors: options.replaceColors });
 
   return code;
 };
