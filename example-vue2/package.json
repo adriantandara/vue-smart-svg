@@ -1,0 +1,21 @@
+{
+  "name": "vue-smart-svg-example-vue2",
+  "private": true,
+  "scripts": {
+    "dev": "webpack serve --config webpack.config.js --mode development",
+    "build": "webpack --config webpack.config.js --mode production"
+  },
+  "dependencies": {
+    "vue": "^2.7.16"
+  },
+  "devDependencies": {
+    "css-loader": "^6.9.1",
+    "style-loader": "^3.3.3",
+    "vue-loader": "^15.11.1",
+    "vue-smart-svg": "file:..",
+    "vue-template-compiler": "^2.7.16",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
