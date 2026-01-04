@@ -1,6 +1,8 @@
-﻿node_modules
+node_modules
 dist
 .vitest
 .DS_Store
 example-vue2/node_modules
 example-vue3/node_modules
+package-lock.json
+examples/**/package-lock.json
