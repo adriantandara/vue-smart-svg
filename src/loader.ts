@@ -12,7 +12,8 @@ const defaultOptions: Required<LoaderOptions> = {
   defaultSize: 24,
   replaceColors: true,
   keepViewBox: true,
-  vueVersion: "auto"
+  vueVersion: "auto",
+  rawMode: "query"
 };
 
 function resolveVueVersion(option: VueVersionOption, context: string): 2 | 3 {
@@ -44,8 +45,14 @@ const loader: LoaderDefinitionFunction<LoaderOptions> = function loader(source) 
 
   const query = this.resourceQuery || "";
   const params = new URLSearchParams(query.startsWith("?") ? query.slice(1) : query);
+  const resourcePath = this.resourcePath || "";
 
-  if (params.has("raw")) {
+  const allowQueryRaw = options.rawMode === "query" || options.rawMode === "both";
+  const allowSuffixRaw = options.rawMode === "suffix" || options.rawMode === "both";
+  const isQueryRaw = allowQueryRaw && params.has("raw");
+  const isSuffixRaw = allowSuffixRaw && resourcePath.toLowerCase().endsWith(".raw.svg");
+
+  if (isQueryRaw || isSuffixRaw) {
     const raw = normalizeSvg(String(source));
     return `export default ${JSON.stringify(raw)};`;
   }

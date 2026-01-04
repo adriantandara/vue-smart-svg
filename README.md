@@ -1,6 +1,6 @@
 # vue-smart-svg
 
-Webpack loader that turns `.svg` files into Vue 2 and Vue 3 components, with `?raw` support and automatic Vue version detection.
+Webpack loader that turns `.svg` files into Vue 2 and Vue 3 components, with raw string imports (`?raw` or `.raw.svg`) and automatic Vue version detection.
 
 ## Install
 
@@ -36,7 +36,7 @@ module.exports = {
         use: [
           {
             loader: "vue-smart-svg/loader",
-            options: { vueVersion: 3 }
+            options: { vueVersion: 3, rawMode: "both" }
           }
         ]
       },
@@ -78,7 +78,7 @@ module.exports = {
         use: [
           {
             loader: "vue-smart-svg/loader",
-            options: { vueVersion: 2 }
+            options: { vueVersion: 2, rawMode: "both" }
           }
         ]
       },
@@ -110,7 +110,11 @@ import Icon from "./icon.svg";
 ### Raw SVG string
 
 ```js
-import raw from "./icon.svg?raw";
+// Default: query flag
+import rawQuery from "./icon.svg?raw";
+
+// Enable suffix handling with `rawMode: "both"` or `rawMode: "suffix"`
+import rawSuffix from "./icon.raw.svg";
 ```
 
 ### URL import
@@ -125,6 +129,10 @@ Add a separate rule for `?url`:
 }
 ```
 
+## Examples
+
+Runnable Vue 2 and Vue 3 demos live in `examples/vue2` and `examples/vue3`, both configured with `rawMode: "both"` to showcase `?raw` and `.raw.svg`. Install deps inside each folder and run `npm run dev`.
+
 ## Loader options
 
 - `svgo` (default `true`): optimize SVGs with SVGO.
@@ -132,6 +140,7 @@ Add a separate rule for `?url`:
 - `replaceColors` (default `true`): replace `fill`/`stroke` with `currentColor` (except `none`).
 - `keepViewBox` (default `true`): keep `viewBox` when optimizing.
 - `vueVersion` (`2` | `3` | `"auto"`, default `"auto"`): auto-detect; falls back to Vue 3 if `vue/package.json` cannot be found.
+- `rawMode` (`"query"` | `"suffix"` | `"both"`, default `"query"`): decide if raw imports are detected via `?raw`, `.raw.svg`, or both.
 
 ## Security note
 

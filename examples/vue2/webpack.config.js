@@ -10,7 +10,8 @@ module.exports = {
     clean: true
   },
   resolve: {
-    extensions: [".js", ".vue"]
+    extensions: [".js", ".vue"],
+    alias: { vue$: "vue/dist/vue.esm.js" }
   },
   module: {
     rules: [
@@ -22,7 +23,7 @@ module.exports = {
         use: [
           {
             loader: "vue-smart-svg/loader",
-            options: { vueVersion: 3 }
+            options: { vueVersion: 2, rawMode: "both" }
           }
         ]
       },
@@ -37,6 +38,6 @@ module.exports = {
   devServer: {
     static: path.resolve(__dirname, "public"),
     hot: true,
-    port: 5173
+    port: 5174
   }
 };
