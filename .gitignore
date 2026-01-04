@@ -4,4 +4,3 @@ dist
 .DS_Store
 example-vue2/node_modules
 example-vue3/node_modules
-examples/**/package-lock.json
