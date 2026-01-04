@@ -28,7 +28,12 @@ jobs:
           if [ -z "$VERSION" ]; then
             echo "Tag name is empty"; exit 1
           fi
-          npm version "$VERSION" --no-git-tag-version
+          CURRENT=$(node -p "require('./package.json').version")
+          if [ "$CURRENT" = "$VERSION" ]; then
+            echo "Package version already $VERSION, skipping bump."
+          else
+            npm version "$VERSION" --no-git-tag-version
+          fi
       - name: Test
         run: npm run test
       - name: Build
