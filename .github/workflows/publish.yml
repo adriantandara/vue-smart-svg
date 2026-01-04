@@ -16,7 +16,6 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
-      # npm ci + rollup native optional deps is flaky on linux; use install instead
       - run: npm install
       - run: npm run test
       - run: npm run build
