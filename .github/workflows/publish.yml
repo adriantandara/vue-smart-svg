@@ -12,13 +12,28 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
-      - run: npm install
-      - run: npm run test
-      - run: npm run build
-      - run: npm publish --access public
+      - name: Use locked deps
+        run: npm ci
+      - name: Sync package version from tag
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          VERSION=${TAG_NAME#v}
+          if [ -z "$VERSION" ]; then
+            echo "Tag name is empty"; exit 1
+          fi
+          npm version "$VERSION" --no-git-tag-version
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
+      - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
