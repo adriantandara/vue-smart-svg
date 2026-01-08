@@ -63,7 +63,7 @@ export default defineComponent({
     replaceColors: { type: Boolean, default: true },
     security: { type: Object as PropType<RemoteSvgSecurityOptions | null>, default: undefined }
   },
-  setup(props, { attrs }) {
+  setup(props: any, { attrs }: any) {
     const rawSvg = ref("");
     const svgHtml = ref("");
 

@@ -53,7 +53,7 @@ function sanitizeOrThrow(svg: string, strict: boolean): string {
   return sanitized;
 }
 
-export default {
+const RemoteSvg: any = {
   name: "RemoteSvg",
   inheritAttrs: false,
   props: {
@@ -70,20 +70,20 @@ export default {
   watch: {
     src: {
       immediate: true,
-      handler() {
+      handler(this: any) {
         this.loadSvg();
       }
     },
     security: {
       deep: true,
-      handler() {
+      handler(this: any) {
         this.loadSvg();
       }
     },
-    title() {
+    title(this: any) {
       this.renderSvg();
     },
-    replaceColors() {
+    replaceColors(this: any) {
       this.renderSvg();
     }
   },
@@ -161,6 +161,8 @@ export default {
     });
   }
 };
+
+export default RemoteSvg;
 
 export { setRemoteSvgSecurity, getRemoteSvgSecurity } from "./remote-security";
 export type { RemoteSvgSecurityOptions } from "./remote-security";

@@ -483,13 +483,17 @@ async function verifyEd25519(
     throw new Error("WebCrypto is not available for Ed25519 verification");
   }
 
+  const publicKeyBuffer = Uint8Array.from(publicKeyBytes).buffer;
+  const signatureBuffer = Uint8Array.from(signatureBytes).buffer;
+  const payloadBuffer = Uint8Array.from(payloadBytes).buffer;
+
   const key = await crypto.subtle.importKey(
     "raw",
-    publicKeyBytes,
+    publicKeyBuffer,
     { name: "Ed25519" },
     false,
     ["verify"]
   );
 
-  return crypto.subtle.verify("Ed25519", key, signatureBytes, payloadBytes);
+  return crypto.subtle.verify("Ed25519", key, signatureBuffer, payloadBuffer);
 }
