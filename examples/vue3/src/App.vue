@@ -46,6 +46,41 @@
         </div>
       </section>
 
+      <section class="rounded-2xl border border-slate-800 bg-slate-900/70 backdrop-blur p-6 space-y-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">Remote SVG (runtime)</h2>
+            <p class="text-slate-400 text-sm">Fetched from CDN, still sized and colorized</p>
+          </div>
+          <span class="text-xs text-slate-400 break-all">{{ remoteSrc }}</span>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <article
+            v-for="row in remoteRows"
+            :key="row.id"
+            class="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-3 text-center"
+          >
+            <div class="flex flex-col items-center gap-3">
+              <RemoteSvg
+                :src="remoteSrc"
+                :security="remoteSecurity"
+                class="w-12 h-12"
+                :class="row.iconClass"
+                :replaceColors="row.replaceColors"
+                :title="row.title"
+              />
+              <span class="font-semibold">{{ row.title }}</span>
+              <p class="text-slate-400 text-sm">{{ row.subtitle }}</p>
+            </div>
+            <p class="text-sm text-slate-200">{{ row.note }}</p>
+          </article>
+        </div>
+        <p class="text-xs text-slate-500">
+          Needs CORS on the CDN; falls back silently if fetch fails (check console). Optional security
+          is disabled in this demo because the CDN does not send signatures.
+        </p>
+      </section>
+
       <section class="grid gap-4 md:grid-cols-2">
         <article class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 space-y-3">
           <div class="flex items-center justify-between">
@@ -76,6 +111,15 @@
 import Icon from "./icons/icon.svg";
 import rawViaQuery from "./icons/icon.svg?raw";
 import rawViaSuffix from "./icons/icon.raw.svg";
+import RemoteSvg from "vue-smart-svg/remote";
+// Optional global security config (call once before mount):
+// import { setRemoteSvgSecurity } from "vue-smart-svg/remote";
+// setRemoteSvgSecurity({
+//   publicKey: "BASE64_PUBLIC_KEY",
+//   signatureHeader: "X-Asset-Signature",
+//   maxAgeMs: 5 * 60 * 1000,
+//   maxBytes: 256 * 1024
+// });
 
 const rows = [
   {
@@ -104,6 +148,27 @@ const rows = [
     replaceColorsLabel: "default (true)",
     iconClass: "text-sky-400",
     note: "Matches the default colorize behavior."
+  }
+];
+
+const remoteSrc = "https://ls.city/cdn/user.svg";
+const remoteSecurity = undefined;
+const remoteRows = [
+  {
+    id: "remote-colored",
+    title: "Current color",
+    subtitle: "Tailwind overrides remote strokes",
+    replaceColors: true,
+    iconClass: "text-indigo-400",
+    note: "Remote SVG uses currentColor, so theme classes apply."
+  },
+  {
+    id: "remote-original",
+    title: "Original remote colors",
+    subtitle: "Leave CDN colors untouched",
+    replaceColors: false,
+    iconClass: "text-emerald-400",
+    note: "Pass replaceColors=false to keep the CDN styling."
   }
 ];
 
